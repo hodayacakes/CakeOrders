@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>הזמנת עוגה - העוגות של הודיה</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            background-color: #fdf6f6;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 24px;
+            border-radius: 16px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            width: 100%;
+            max-width: 450px;
+        }
+        .brand-header {
+            text-align: center;
+            margin-bottom: 16px;
+        }
+        .brand-logo {
+            width: 80px;
+            height: 80px;
+            background-color: #fce8ea;
+            border: 2px solid #d65a62;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 38px;
+            margin-bottom: 8px;
+            overflow: hidden;
+        }
+        .brand-logo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .brand-name {
+            color: #d65a62;
+            margin: 0;
+            font-size: 24px;
+            font-weight: bold;
+        }
+        p.subtitle {
+            text-align: center;
+            color: #666;
+            font-size: 14px;
+            margin-top: 6px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 16px;
+        }
+        label.field-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+            font-size: 14px;
+        }
+        input[type="text"], input[type="date"], input[type="time"], select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            box-sizing: border-box;
+            font-family: inherit;
+            background-color: #fff;
+        }
+        textarea {
+            resize: vertical;
+            min-height: 70px;
+        }
+        .row {
+            display: flex;
+            gap: 10px;
+        }
+        .row .form-group {
+            flex: 1;
+        }
+        .radio-group {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+        .radio-option {
+            flex: 1;
+            min-width: 85px;
+        }
+        .radio-option input[type="radio"] {
+            display: none;
+        }
+        .radio-option label {
+            display: block;
+            text-align: center;
+            padding: 10px 8px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #fafafa;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: normal;
+            transition: all 0.2s;
+        }
+        .radio-option input[type="radio"]:checked + label {
+            background-color: #d65a62;
+            color: white;
+            border-color: #d65a62;
+            font-weight: bold;
+        }
+        .hint-text {
+            font-size: 12px;
+            color: #777;
+            margin-top: 4px;
+        }
+        .hidden {
+            display: none;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 17px;
+            font-weight: bold;
+            color: white;
+            cursor: pointer;
+            margin-top: 16px;
+            text-align: center;
+        }
+        .btn-wa {
+            background-color: #25D366;
+        }
+        .btn-clear {
+            background-color: #9e9e9e;
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="brand-header">
+        <div class="brand-logo" id="logoContainer">🧁</div>
+        <h1 class="brand-name">העוגות של הודיה</h1>
+        <p class="subtitle">מלאו את פרטי ההזמנה ולחצו לשליחה בוואטסאפ</p>
+    </div>
+    
+    <div class="form-group">
+        <label class="field-label" for="customerName">שם מלא:</label>
+        <input type="text" id="customerName" required>
+    </div>
+
+    <div class="row">
+        <div class="form-group">
+            <label class="field-label" for="orderDate">תאריך מבוקש:</label>
+            <input type="date" id="orderDate" required>
+        </div>
+        <div class="form-group">
+            <label class="field-label" for="orderTime">שעה (לא חובה):</label>
+            <input type="time" id="orderTime">
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="field-label" for="deliveryType">אופן קבלה:</label>
+        <select id="deliveryType" onchange="toggleAddress()">
+            <option value="איסוף עצמי">איסוף עצמי</option>
+            <option value="משלוח">משלוח</option>
+        </select>
+    </div>
+
+    <div class="form-group hidden" id="addressGroup">
+        <label class="field-label" for="deliveryAddress">כתובת למשלוח:</label>
+        <input type="text" id="deliveryAddress" placeholder="רחוב, מספר בית, עיר">
+    </div>
+
+    <div class="form-group">
+        <label class="field-label" for="cakeType">סוג העוגה:</label>
+        <select id="cakeType" onchange="toggleCakeDetails()">
+            <option value="" selected>-- בחרו סוג עוגה --</option>
+            <option value="בנטו">בנטו</option>
+            <option value="בנטו לב">בנטו לב</option>
+            <option value="מיני">מיני</option>
+            <option value="מיני לב">מיני לב</option>
+            <option value="מעוצבת">מעוצבת</option>
+            <option value="מעוצבת לב">מעוצבת לב</option>
+            <option value="גן A4">גן A4</option>
+            <option value="גן A3">גן A3</option>
+            <option value="מארז בנטו">מארז בנטו</option>
+            <option value="בצק פריך">בצק פריך</option>
+            <option value="מוס">מוס</option>
+            <option value="אחר">אחר (מלל חופשי)</option>
+        </select>
+    </div>
+
+    <div class="form-group hidden" id="shortbreadGroup">
+        <label class="field-label" for="shortbreadDetails">תוכן הבצק הפריך (צורה, מספר, אות, קישוטים):</label>
+        <textarea id="shortbreadDetails" placeholder="לדוגמה: ספרה 30, שוקולדים, פירות, מקרונים..."></textarea>
+    </div>
+
+    <div class="form-group hidden" id="customCakeGroup">
+        <label class="field-label" for="customCakeText">פירוט סוג העוגה:</label>
+        <input type="text" id="customCakeText" placeholder="הקלידו כאן את סוג העוגה או המאפה">
+    </div>
+
+    <div class="form-group">
+        <label class="field-label">כשרות:</label>
+        <div class="radio-group">
+            <div class="radio-option">
+                <input type="radio" id="kosherDairy" name="kosher" value="חלבי">
+                <label for="kosherDairy">חלבי</label>
+            </div>
+            <div class="radio-option">
+                <input type="radio" id="kosherParve" name="kosher" value="פרווה">
+                <label for="kosherParve">פרווה</label>
+            </div>
+            <div class="radio-option">
+                <input type="radio" id="kosherLater" name="kosher" value="יקבע בהמשך">
+                <label for="kosherLater">יקבע בהמשך</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="field-label">בסיס העוגה:</label>
+        <div class="radio-group">
+            <div class="radio-option">
+                <input type="radio" id="flavorSponge" name="flavor" value="טורט">
+                <label for="flavorSponge">טורט</label>
+            </div>
+            <div class="radio-option">
+                <input type="radio" id="flavorChoc" name="flavor" value="שוקולד">
+                <label for="flavorChoc">שוקולד</label>
+            </div>
+            <div class="radio-option">
+                <input type="radio" id="flavorLater" name="flavor" value="יקבע בהמשך">
+                <label for="flavorLater">יקבע בהמשך</label>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label class="field-label" for="allergies">רגישויות / אלרגיות (לא חובה):</label>
+        <input type="text" id="allergies" placeholder="לדוגמה: ללא גלוטן, אגוזים, לקטוז...">
+    </div>
+
+    <div class="form-group">
+        <label class="field-label" for="cakeText">כיתוב על העוגה (לא חובה):</label>
+        <input type="text" id="cakeText">
+    </div>
+
+    <div class="form-group">
+        <label class="field-label" for="cakeDesign">עיצוב וצבעים (לא חובה):</label>
+        <textarea id="cakeDesign"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label class="field-label" for="orderNotes">הערות ודגשים (לא חובה):</label>
+        <textarea id="orderNotes"></textarea>
+    </div>
+
+    <button type="button" class="btn btn-wa" onclick="sendOrderToWhatsApp()">שליחת הזמנה בוואטסאפ 📲</button>
+    <div class="hint-text" style="text-align: center;">יש לכם תמונות השראה? תוכלו לצרף אותן ישירות בצ׳אט מיד לאחר פתיחת הוואטסאפ 📷</div>
+    
+    <button type="button" class="btn btn-clear" onclick="clearForm()">נקה טופס</button>
+</div>
+<script>
+    const MY_PHONE = '972546686383';
+
+    function toggleAddress() {
+        const type = document.getElementById('deliveryType').value;
+        const addressGroup = document.getElementById('addressGroup');
+        if (type === 'משלוח') {
+            addressGroup.classList.remove('hidden');
+        } else {
+            addressGroup.classList.add('hidden');
+        }
+    }
+
+    function toggleCakeDetails() {
+        const cakeType = document.getElementById('cakeType').value;
+        const customCakeGroup = document.getElementById('customCakeGroup');
+        const customCakeInput = document.getElementById('customCakeText');
+        const shortbreadGroup = document.getElementById('shortbreadGroup');
+        const shortbreadInput = document.getElementById('shortbreadDetails');
+
+        customCakeGroup.classList.add('hidden');
+        shortbreadGroup.classList.add('hidden');
+
+        if (cakeType === 'אחר') {
+            customCakeGroup.classList.remove('hidden');
+            customCakeInput.focus();
+        } else if (cakeType === 'בצק פריך') {
+            shortbreadGroup.classList.remove('hidden');
+            shortbreadInput.focus();
+        }
+    }
+
+    function formatDateHebrew(dateStr) {
+        if (!dateStr) return '';
+        return dateStr.split('-').reverse().join('/');
+    }
+
+    function getRadioValue(name) {
+        const checked = document.querySelector('input[name="' + name + '"]:checked');
+        return checked ? checked.value : '';
+    }
+
+    function getFormData() {
+        const name = document.getElementById('customerName').value.trim();
+        const date = document.getElementById('orderDate').value;
+        const time = document.getElementById('orderTime').value;
+        const type = document.getElementById('deliveryType').value;
+        const address = document.getElementById('deliveryAddress').value.trim();
+        
+        const cakeSelect = document.getElementById('cakeType').value;
+        const customCake = document.getElementById('customCakeText').value.trim();
+        const shortbread = document.getElementById('shortbreadDetails').value.trim();
+        
+        let cake = cakeSelect;
+        if (cakeSelect === 'אחר') {
+            cake = customCake;
+        } else if (cakeSelect === 'בצק פריך' && shortbread) {
+            cake = 'בצק פריך (' + shortbread + ')';
+        }
+
+        const kosher = getRadioValue('kosher');
+        const flavor = getRadioValue('flavor');
+        const allergies = document.getElementById('allergies').value.trim();
+        const cakeText = document.getElementById('cakeText').value.trim();
+        const design = document.getElementById('cakeDesign').value.trim();
+        const notes = document.getElementById('orderNotes').value.trim();
+
+        if (!name || !date) {
+            alert('נא למלא שם מלא ותאריך מבוקש.');
+            return null;
+        }
+        return { name, date, time, type, address, cake, kosher, flavor, allergies, cakeText, design, notes };
+    }
+
+    function sendOrderToWhatsApp() {
+        const data = getFormData();
+        if (!data) return;
+
+        const deliveryText = data.type === 'משלוח' 
+            ? 'משלוח לכתובת: ' + (data.address || 'לא צוינה כתובת') 
+            : 'איסוף עצמי';
+
+        const timeText = data.time ? ' בשעה ' + data.time : '';
+
+        let text = '*🧁 הזמנה חדשה לקונדיטוריה 🧁*\n\n';
+        text += '*שם:* ' + data.name + '\n';
+        text += '*מועד:* ' + formatDateHebrew(data.date) + timeText + '\n';
+        text += '*אופן קבלה:* ' + deliveryText + '\n';
+        
+        if (data.cake) {
+            text += '*סוג עוגה:* ' + data.cake + '\n';
+        }
+        
+        let specs = [];
+        if (data.kosher) specs.push('*כשרות:* ' + data.kosher);
+        if (data.flavor) specs.push('*בסיס:* ' + data.flavor);
+        if (specs.length > 0) {
+            text += specs.join(' | ') + '\n';
+        }
+
+        if (data.allergies) {
+            text += '*⚠️ רגישויות:* ' + data.allergies + '\n';
+        }
+        
+        if (data.cakeText) {
+            text += '*כיתוב על העוגה:* ' + data.cakeText + '\n';
+        }
+        if (data.design) {
+            text += '*עיצוב וצבעים:* ' + data.design + '\n';
+        }
+        if (data.notes) {
+            text += '*הערות:* ' + data.notes + '\n';
+        }
+
+        const encodedText = encodeURIComponent(text.trim());
+        window.location.href = 'whatsapp://send?phone=' + MY_PHONE + '&text=' + encodedText;
+    }
+
+    function clearForm() {
+        if(confirm('לנקות את כל השדות?')) {
+            document.getElementById('customerName').value = '';
+            document.getElementById('orderDate').value = '';
+            document.getElementById('orderTime').value = '';
+            document.getElementById('deliveryType').value = 'איסוף עצמי';
+            document.getElementById('deliveryAddress').value = '';
+            document.getElementById('cakeType').value = '';
+            document.getElementById('customCakeText').value = '';
+            document.getElementById('shortbreadDetails').value = '';
+            
+            document.querySelectorAll('input[type="radio"]').forEach(r => r.checked = false);
+            
+            document.getElementById('allergies').value = '';
+            document.getElementById('cakeText').value = '';
+            document.getElementById('cakeDesign').value = '';
+            document.getElementById('orderNotes').value = '';
+            
+            toggleAddress();
+            toggleCakeDetails();
+        }
+    }
+</script>
+
+</body>
+</html>
