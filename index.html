@@ -495,8 +495,8 @@
         let cakeLine = '';
         let location = 'איסוף עצמי';
 
-        for (let i = 0; i < lines.length; i++) {
-            const line = lines.item(i).trim();
+        lines.forEach(function(rawLine) {
+            const line = rawLine.trim();
             if (line.startsWith('שם:')) {
                 customerName = line.substring(3).trim();
             } else if (line.startsWith('מועד:')) {
@@ -506,7 +506,7 @@
             } else if (line.startsWith('אופן קבלה:')) {
                 location = line.substring(10).trim();
             }
-        }
+        });
 
         if (!dateLine || !dateLine.includes('/')) {
             alert('לא זוהה תאריך תקין בהודעה. ודאו שהעתקתם את כל הודעת ההזמנה.');
@@ -514,7 +514,7 @@
         }
 
         const partsBySpace = dateLine.split(' ');
-        const datePart = partsBySpace.item(0);
+        const datePart = partsBySpace.shift();
         const dParts = datePart.split('/');
         
         if (dParts.length !== 3) {
@@ -522,22 +522,20 @@
             return null;
         }
 
-        const day = dParts.item(0).padStart(2, '0');
-        const month = dParts.item(1).padStart(2, '0');
-        const year = dParts.item(2);
+        const day = dParts.shift().padStart(2, '0');
+        const month = dParts.shift().padStart(2, '0');
+        const year = dParts.shift();
         
         let timeStr = '';
-        for (let j = 1; j < partsBySpace.length; j++) {
-            const token = partsBySpace.item(j);
+        partsBySpace.forEach(function(token) {
             if (token.includes(':')) {
                 timeStr = token;
-                break;
             }
-        }
+        });
 
         const isoDate = year + '-' + month + '-' + day;
         const cleanDate = year + month + day;
-        const cakeShort = cakeLine ? ' - ' + cakeLine.split(' (').item(0).trim() : '';
+        const cakeShort = cakeLine ? ' - ' + cakeLine.split(' (').shift().trim() : '';
         const title = 'הזמנה: ' + customerName + cakeShort;
 
         return { isoDate, cleanDate, timeStr, title, location, cleanRaw };
@@ -550,8 +548,8 @@
         let datesParam = '';
         if (info.timeStr) {
             const tParts = info.timeStr.split(':');
-            const hh = tParts.item(0).padStart(2, '0');
-            const mm = tParts.item(1).padStart(2, '0');
+            const hh = tParts.shift().padStart(2, '0');
+            const mm = tParts.shift().padStart(2, '0');
             const startStr = info.cleanDate + 'T' + hh + mm + '00';
             
             const startObj = new Date(info.isoDate + 'T' + hh + ':' + mm + ':00');
@@ -591,8 +589,8 @@
 
         if (info.timeStr) {
             const tParts = info.timeStr.split(':');
-            const hh = tParts.item(0).padStart(2, '0');
-            const mm = tParts.item(1).padStart(2, '0');
+            const hh = tParts.shift().padStart(2, '0');
+            const mm = tParts.shift().padStart(2, '0');
             dtStart = 'DTSTART:' + info.cleanDate + 'T' + hh + mm + '00';
             
             const startObj = new Date(info.isoDate + 'T' + hh + ':' + mm + ':00');
@@ -630,8 +628,15 @@
             'END:VCALENDAR'
         ].join('\r\n');
 
-        const dataUri = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsLines);
-        window.location.href = dataUri;
+        const blob = new Blob([icsLines], { type: 'text/calendar;charset=utf-8' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'order.ics';
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
     }
     function toggleA11yMenu() {
         document.getElementById('a11yMenu').classList.toggle('hidden');
