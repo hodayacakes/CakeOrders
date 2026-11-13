@@ -177,11 +177,8 @@
         .btn-wa {
             background-color: #25D366;
         }
-        .btn-cal {
-            background-color: #4285F4;
-        }
         .btn-ics {
-            background-color: #5c7cfa;
+            background-color: #4285F4;
         }
         .btn-clear {
             background-color: #b5a6a3;
@@ -196,20 +193,26 @@
             padding: 16px;
             margin-bottom: 20px;
         }
+        .admin-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
         .admin-box h3 {
-            margin: 0 0 8px 0;
+            margin: 0;
             color: #2b579a;
             font-size: 16px;
         }
-        .admin-btns {
-            display: flex;
-            gap: 8px;
-            margin-top: 10px;
-        }
-        .admin-btns .btn {
-            margin-top: 0;
-            padding: 12px 8px;
-            font-size: 14px;
+        .btn-mini-clear {
+            background: #e1e8f8;
+            color: #2b579a;
+            border: 1px solid #c2d4f8;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 12px;
+            font-weight: bold;
+            cursor: pointer;
         }
         .a11y-btn {
             position: fixed;
@@ -326,13 +329,13 @@
 <div class="container" id="mainContainer">
     
     <div class="admin-box hidden" id="adminPanel">
-        <h3>📅 הוספת הזמנה שאושרה ליומן</h3>
+        <div class="admin-header">
+            <h3>📅 הוספת הזמנה שאושרה ליומן</h3>
+            <button type="button" class="btn-mini-clear" onclick="document.getElementById('pasteOrderText').value=''">נקה תיבה</button>
+        </div>
         <p style="font-size: 13px; margin: 0 0 10px 0; color: #444;">העתיקו את הודעת הוואטסאפ מהלקוח והדביקו כאן:</p>
         <textarea id="pasteOrderText" placeholder="הדביקו כאן את תוכן ההזמנה מוואטסאפ..." style="min-height: 90px; font-size: 14px;"></textarea>
-        <div class="admin-btns">
-            <button type="button" class="btn btn-cal" onclick="addToGoogleCalendarDirect()">יומן גוגל ישיר 📅</button>
-            <button type="button" class="btn btn-ics" onclick="downloadIcsFile()">הורד קובץ יומן 📥</button>
-        </div>
+        <button type="button" class="btn btn-ics" style="margin-top: 10px; padding: 12px; font-size: 15px;" onclick="downloadIcsFile()">הוסף ליומן בנייד 📅</button>
     </div>
 
     <div class="brand-header">
@@ -541,45 +544,6 @@
         return { isoDate, cleanDate, timeStr, title, location, cleanRaw };
     }
 
-    function addToGoogleCalendarDirect() {
-        const info = extractOrderDataFromText();
-        if (!info) return;
-
-        let datesParam = '';
-        if (info.timeStr) {
-            const tParts = info.timeStr.split(':');
-            const hh = tParts.shift().padStart(2, '0');
-            const mm = tParts.shift().padStart(2, '0');
-            const startStr = info.cleanDate + 'T' + hh + mm + '00';
-            
-            const startObj = new Date(info.isoDate + 'T' + hh + ':' + mm + ':00');
-            const endObj = new Date(startObj.getTime() + 60 * 60 * 1000);
-            
-            const endY = endObj.getFullYear();
-            const endM = String(endObj.getMonth() + 1).padStart(2, '0');
-            const endD = String(endObj.getDate()).padStart(2, '0');
-            const endH = String(endObj.getHours()).padStart(2, '0');
-            const endMin = String(endObj.getMinutes()).padStart(2, '0');
-            
-            datesParam = startStr + '/' + endY + endM + endD + 'T' + endH + endMin + '00';
-        } else {
-            const startObj = new Date(info.isoDate + 'T12:00:00');
-            const nextObj = new Date(startObj.getTime() + 24 * 60 * 60 * 1000);
-            const nextY = nextObj.getFullYear();
-            const nextM = String(nextObj.getMonth() + 1).padStart(2, '0');
-            const nextD = String(nextObj.getDate()).padStart(2, '0');
-            datesParam = info.cleanDate + '/' + nextY + nextM + nextD;
-        }
-
-        const calUrl = 'https://google.com' +
-            '?text=' + encodeURIComponent(info.title) +
-            '&dates=' + datesParam +
-            '&details=' + encodeURIComponent(info.cleanRaw) +
-            '&location=' + encodeURIComponent(info.location);
-
-        window.location.href = calUrl;
-    }
-
     function downloadIcsFile() {
         const info = extractOrderDataFromText();
         if (!info) return;
@@ -619,6 +583,7 @@
             'VERSION:2.0',
             'PRODID:-//Hodayas Cakes//HE',
             'BEGIN:VEVENT',
+            'UID:hodaya_current_order@hodayascakes.local',
             dtStart,
             dtEnd,
             'SUMMARY:' + info.title,
@@ -632,7 +597,7 @@
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'order.ics';
+        a.download = 'hodaya_order.ics';
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
