@@ -488,27 +488,57 @@
         }
 
         const cleanRaw = raw.replace(/\*/g, '');
-        const nameMatch = cleanRaw.match(/שם:\s*(.+)/);
-        const dateMatch = cleanRaw.match(/מועד:\s*(\d{1,2})\/(\d{1,2})\/(\d{4})(?:\s+בשעה\s+(\d{1,2}:\d{2}))?/);
-        const cakeMatch = cleanRaw.match(/סוג עוגה:\s*(.+)/);
-        const deliveryMatch = cleanRaw.match(/אופן קבלה:\s*(.+)/);
+        const lines = cleanRaw.split('\n');
+        
+        let customerName = 'לקוח/ה';
+        let dateLine = '';
+        let cakeLine = '';
+        let location = 'איסוף עצמי';
 
-        if (!dateMatch) {
+        for (let i = 0; i < lines.length; i++) {
+            const line = lines.item(i).trim();
+            if (line.startsWith('שם:')) {
+                customerName = line.substring(3).trim();
+            } else if (line.startsWith('מועד:')) {
+                dateLine = line.substring(5).trim();
+            } else if (line.startsWith('סוג עוגה:')) {
+                cakeLine = line.substring(9).trim();
+            } else if (line.startsWith('אופן קבלה:')) {
+                location = line.substring(10).trim();
+            }
+        }
+
+        if (!dateLine || !dateLine.includes('/')) {
             alert('לא זוהה תאריך תקין בהודעה. ודאו שהעתקתם את כל הודעת ההזמנה.');
             return null;
         }
 
-        const customerName = nameMatch ? nameMatch[1].trim() : 'לקוח/ה';
-        const day = dateMatch[1].padStart(2, '0');
-        const month = dateMatch[2].padStart(2, '0');
-        const year = dateMatch[3];
-        const timeStr = dateMatch[4] || '';
+        const partsBySpace = dateLine.split(' ');
+        const datePart = partsBySpace.item(0);
+        const dParts = datePart.split('/');
         
+        if (dParts.length !== 3) {
+            alert('פורמט תאריך לא תקין בהודעה.');
+            return null;
+        }
+
+        const day = dParts.item(0).padStart(2, '0');
+        const month = dParts.item(1).padStart(2, '0');
+        const year = dParts.item(2);
+        
+        let timeStr = '';
+        for (let j = 1; j < partsBySpace.length; j++) {
+            const token = partsBySpace.item(j);
+            if (token.includes(':')) {
+                timeStr = token;
+                break;
+            }
+        }
+
         const isoDate = year + '-' + month + '-' + day;
         const cleanDate = year + month + day;
-        const cakeShort = cakeMatch ? ' - ' + cakeMatch[1].split(' (')[0].trim() : '';
+        const cakeShort = cakeLine ? ' - ' + cakeLine.split(' (').item(0).trim() : '';
         const title = 'הזמנה: ' + customerName + cakeShort;
-        const location = deliveryMatch ? deliveryMatch[1].trim() : 'איסוף עצמי';
 
         return { isoDate, cleanDate, timeStr, title, location, cleanRaw };
     }
@@ -519,9 +549,9 @@
 
         let datesParam = '';
         if (info.timeStr) {
-            const parts = info.timeStr.split(':');
-            const hh = parts[0].padStart(2, '0');
-            const mm = parts[1].padStart(2, '0');
+            const tParts = info.timeStr.split(':');
+            const hh = tParts.item(0).padStart(2, '0');
+            const mm = tParts.item(1).padStart(2, '0');
             const startStr = info.cleanDate + 'T' + hh + mm + '00';
             
             const startObj = new Date(info.isoDate + 'T' + hh + ':' + mm + ':00');
@@ -544,7 +574,7 @@
         }
 
         const calUrl = 'https://google.com' +
-            '&text=' + encodeURIComponent(info.title) +
+            '?text=' + encodeURIComponent(info.title) +
             '&dates=' + datesParam +
             '&details=' + encodeURIComponent(info.cleanRaw) +
             '&location=' + encodeURIComponent(info.location);
@@ -560,9 +590,9 @@
         let dtEnd = '';
 
         if (info.timeStr) {
-            const parts = info.timeStr.split(':');
-            const hh = parts[0].padStart(2, '0');
-            const mm = parts[1].padStart(2, '0');
+            const tParts = info.timeStr.split(':');
+            const hh = tParts.item(0).padStart(2, '0');
+            const mm = tParts.item(1).padStart(2, '0');
             dtStart = 'DTSTART:' + info.cleanDate + 'T' + hh + mm + '00';
             
             const startObj = new Date(info.isoDate + 'T' + hh + ':' + mm + ':00');
