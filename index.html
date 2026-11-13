@@ -588,7 +588,13 @@
         }
 
         const encodedText = encodeURIComponent(text.trim());
-        window.location.href = 'https://wa.me' + MY_PHONE + '?text=' + encodedText;
+        const isMobile = /Android|iPhone|iPad|iPod/i.test(navigator.userAgent);
+
+        if (isMobile) {
+            window.location.href = 'whatsapp://send?phone=' + MY_PHONE + '&text=' + encodedText;
+        } else {
+            window.open('https://whatsapp.com' + MY_PHONE + '&text=' + encodedText, '_blank');
+        }
     }
 
     function clearForm() {
