@@ -180,6 +180,9 @@
         .btn-cal {
             background-color: #4285F4;
         }
+        .btn-ics {
+            background-color: #5c7cfa;
+        }
         .btn-clear {
             background-color: #b5a6a3;
             margin-top: 12px;
@@ -197,6 +200,16 @@
             margin: 0 0 8px 0;
             color: #2b579a;
             font-size: 16px;
+        }
+        .admin-btns {
+            display: flex;
+            gap: 8px;
+            margin-top: 10px;
+        }
+        .admin-btns .btn {
+            margin-top: 0;
+            padding: 12px 8px;
+            font-size: 14px;
         }
         .a11y-btn {
             position: fixed;
@@ -316,7 +329,10 @@
         <h3>📅 הוספת הזמנה שאושרה ליומן</h3>
         <p style="font-size: 13px; margin: 0 0 10px 0; color: #444;">העתיקו את הודעת הוואטסאפ מהלקוח והדביקו כאן:</p>
         <textarea id="pasteOrderText" placeholder="הדביקו כאן את תוכן ההזמנה מוואטסאפ..." style="min-height: 90px; font-size: 14px;"></textarea>
-        <button type="button" class="btn btn-cal" style="margin-top: 10px; padding: 12px; font-size: 15px;" onclick="addToGoogleCalendarDirect()">הוסף ליומן גוגל 📅</button>
+        <div class="admin-btns">
+            <button type="button" class="btn btn-cal" onclick="addToGoogleCalendarDirect()">יומן גוגל ישיר 📅</button>
+            <button type="button" class="btn btn-ics" onclick="downloadIcsFile()">הורד קובץ יומן 📥</button>
+        </div>
     </div>
 
     <div class="brand-header">
@@ -464,11 +480,11 @@
         }
     })();
 
-    function addToGoogleCalendarDirect() {
+    function extractOrderDataFromText() {
         const raw = document.getElementById('pasteOrderText').value.trim();
         if (!raw) {
             alert('נא להדביק קודם את הודעת ההזמנה מוואטסאפ.');
-            return;
+            return null;
         }
 
         const cleanRaw = raw.replace(/\*/g, '');
@@ -479,7 +495,7 @@
 
         if (!dateMatch) {
             alert('לא זוהה תאריך תקין בהודעה. ודאו שהעתקתם את כל הודעת ההזמנה.');
-            return;
+            return null;
         }
 
         const customerName = nameMatch ? nameMatch[1].trim() : 'לקוח/ה';
@@ -490,15 +506,25 @@
         
         const isoDate = year + '-' + month + '-' + day;
         const cleanDate = year + month + day;
+        const cakeShort = cakeMatch ? ' - ' + cakeMatch[1].split(' (')[0].trim() : '';
+        const title = 'הזמנה: ' + customerName + cakeShort;
+        const location = deliveryMatch ? deliveryMatch[1].trim() : 'איסוף עצמי';
+
+        return { isoDate, cleanDate, timeStr, title, location, cleanRaw };
+    }
+
+    function addToGoogleCalendarDirect() {
+        const info = extractOrderDataFromText();
+        if (!info) return;
 
         let datesParam = '';
-        if (timeStr) {
-            const parts = timeStr.split(':');
+        if (info.timeStr) {
+            const parts = info.timeStr.split(':');
             const hh = parts[0].padStart(2, '0');
             const mm = parts[1].padStart(2, '0');
-            const startStr = cleanDate + 'T' + hh + mm + '00';
+            const startStr = info.cleanDate + 'T' + hh + mm + '00';
             
-            const startObj = new Date(isoDate + 'T' + hh + ':' + mm + ':00');
+            const startObj = new Date(info.isoDate + 'T' + hh + ':' + mm + ':00');
             const endObj = new Date(startObj.getTime() + 60 * 60 * 1000);
             
             const endY = endObj.getFullYear();
@@ -509,31 +535,73 @@
             
             datesParam = startStr + '/' + endY + endM + endD + 'T' + endH + endMin + '00';
         } else {
-            const startObj = new Date(isoDate + 'T12:00:00');
+            const startObj = new Date(info.isoDate + 'T12:00:00');
             const nextObj = new Date(startObj.getTime() + 24 * 60 * 60 * 1000);
             const nextY = nextObj.getFullYear();
             const nextM = String(nextObj.getMonth() + 1).padStart(2, '0');
             const nextD = String(nextObj.getDate()).padStart(2, '0');
-            datesParam = cleanDate + '/' + nextY + nextM + nextD;
+            datesParam = info.cleanDate + '/' + nextY + nextM + nextD;
         }
 
-        const cakeShort = cakeMatch ? ' - ' + cakeMatch[1].split(' (')[0].trim() : '';
-        const title = 'הזמנה: ' + customerName + cakeShort;
-        const location = deliveryMatch ? deliveryMatch[1].trim() : 'איסוף עצמי';
-
         const calUrl = 'https://google.com' +
-            '&text=' + encodeURIComponent(title) +
+            '&text=' + encodeURIComponent(info.title) +
             '&dates=' + datesParam +
-            '&details=' + encodeURIComponent(cleanRaw) +
-            '&location=' + encodeURIComponent(location);
+            '&details=' + encodeURIComponent(info.cleanRaw) +
+            '&location=' + encodeURIComponent(info.location);
 
-        const a = document.createElement('a');
-        a.href = calUrl;
-        a.target = '_blank';
-        a.rel = 'noopener noreferrer';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        window.location.href = calUrl;
+    }
+
+    function downloadIcsFile() {
+        const info = extractOrderDataFromText();
+        if (!info) return;
+
+        let dtStart = '';
+        let dtEnd = '';
+
+        if (info.timeStr) {
+            const parts = info.timeStr.split(':');
+            const hh = parts[0].padStart(2, '0');
+            const mm = parts[1].padStart(2, '0');
+            dtStart = 'DTSTART:' + info.cleanDate + 'T' + hh + mm + '00';
+            
+            const startObj = new Date(info.isoDate + 'T' + hh + ':' + mm + ':00');
+            const endObj = new Date(startObj.getTime() + 60 * 60 * 1000);
+            
+            const endY = endObj.getFullYear();
+            const endM = String(endObj.getMonth() + 1).padStart(2, '0');
+            const endD = String(endObj.getDate()).padStart(2, '0');
+            const endH = String(endObj.getHours()).padStart(2, '0');
+            const endMin = String(endObj.getMinutes()).padStart(2, '0');
+            
+            dtEnd = 'DTEND:' + endY + endM + endD + 'T' + endH + endMin + '00';
+        } else {
+            dtStart = 'DTSTART;VALUE=DATE:' + info.cleanDate;
+            const startObj = new Date(info.isoDate + 'T12:00:00');
+            const nextObj = new Date(startObj.getTime() + 24 * 60 * 60 * 1000);
+            const nextY = nextObj.getFullYear();
+            const nextM = String(nextObj.getMonth() + 1).padStart(2, '0');
+            const nextD = String(nextObj.getDate()).padStart(2, '0');
+            dtEnd = 'DTEND;VALUE=DATE:' + nextY + nextM + nextD;
+        }
+
+        const desc = info.cleanRaw.replace(/\r?\n/g, '\\n');
+        const icsLines = [
+            'BEGIN:VCALENDAR',
+            'VERSION:2.0',
+            'PRODID:-//Hodayas Cakes//HE',
+            'BEGIN:VEVENT',
+            dtStart,
+            dtEnd,
+            'SUMMARY:' + info.title,
+            'DESCRIPTION:' + desc,
+            'LOCATION:' + info.location,
+            'END:VEVENT',
+            'END:VCALENDAR'
+        ].join('\r\n');
+
+        const dataUri = 'data:text/calendar;charset=utf-8,' + encodeURIComponent(icsLines);
+        window.location.href = dataUri;
     }
     function toggleA11yMenu() {
         document.getElementById('a11yMenu').classList.toggle('hidden');
