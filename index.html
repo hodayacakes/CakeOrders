@@ -124,7 +124,7 @@
         }
         .radio-option {
             flex: 1;
-            min-width: 100px;
+            min-width: 90px;
         }
         .radio-option input[type="radio"] {
             display: none;
@@ -132,12 +132,12 @@
         .radio-option label {
             display: block;
             text-align: center;
-            padding: 10px 8px;
+            padding: 10px 6px;
             border: 1px solid #e6d5d0;
             border-radius: 8px;
             background-color: #fcf9f8;
             cursor: pointer;
-            font-size: 14px;
+            font-size: 13.5px;
             font-weight: normal;
             transition: all 0.2s;
         }
@@ -177,13 +177,27 @@
         .btn-wa {
             background-color: #25D366;
         }
+        .btn-cal {
+            background-color: #4285F4;
+        }
         .btn-clear {
             background-color: #b5a6a3;
             margin-top: 12px;
             padding: 10px;
             font-size: 14px;
         }
-        /* עיצוב תפריט נגישות */
+        .admin-box {
+            background-color: #f0f4ff;
+            border: 2px dashed #4285F4;
+            border-radius: 12px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
+        .admin-box h3 {
+            margin: 0 0 8px 0;
+            color: #2b579a;
+            font-size: 16px;
+        }
         .a11y-btn {
             position: fixed;
             top: 14px;
@@ -237,7 +251,6 @@
         .a11y-menu button:last-child {
             margin-bottom: 0;
         }
-        /* מצבי נגישות פעילים */
         body.large-text .container {
             font-size: 120%;
         }
@@ -297,7 +310,15 @@
     <button type="button" onclick="resetA11y()">🔄 איפוס נגישות</button>
 </div>
 
-<div class="container">
+<div class="container" id="mainContainer">
+    
+    <div class="admin-box hidden" id="adminPanel">
+        <h3>📅 הוספת הזמנה שאושרה ליומן</h3>
+        <p style="font-size: 13px; margin: 0 0 10px 0; color: #444;">העתיקו את הודעת הוואטסאפ מהלקוח והדביקו כאן:</p>
+        <textarea id="pasteOrderText" placeholder="הדביקו כאן את תוכן ההזמנה מוואטסאפ..." style="min-height: 90px; font-size: 14px;"></textarea>
+        <button type="button" class="btn btn-cal" style="margin-top: 10px; padding: 12px; font-size: 15px;" onclick="parseAndOpenCalendar()">הוסף ליומן גוגל 📅</button>
+    </div>
+
     <div class="brand-header">
         <img src="logo.png" alt="העוגות של הודיה" class="brand-logo-clean">
         <h1 class="brand-title">העוגות של הודיה</h1>
@@ -375,6 +396,10 @@
                 <label for="kosherDairy">חלבי</label>
             </div>
             <div class="radio-option">
+                <input type="radio" id="kosherIsrael" name="kosher" value="חלבי - חלב ישראל">
+                <label for="kosherIsrael">חלבי - חלב ישראל</label>
+            </div>
+            <div class="radio-option">
                 <input type="radio" id="kosherParve" name="kosher" value="פרווה">
                 <label for="kosherParve">פרווה</label>
             </div>
@@ -431,6 +456,71 @@
         '<circle cx="8.5" cy="7.5" r="3" fill="#d65a62"/>' +
         '<path d="M8.5 12c-2.8 0-5.5 1.4-5.5 4v2.5h11V16c0-2.6-2.7-4-5.5-4z" fill="#d65a62"/>' +
     '</svg>';
+
+    (function checkAdminMode() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('admin') === '1') {
+            document.getElementById('adminPanel').classList.remove('hidden');
+        }
+    })();
+
+    function parseAndOpenCalendar() {
+        const raw = document.getElementById('pasteOrderText').value.trim();
+        if (!raw) {
+            alert('נא להדביק קודם את הודעת ההזמנה מוואטסאפ.');
+            return;
+        }
+
+        const cleanRaw = raw.replace(/\*/g, '');
+        const nameMatch = cleanRaw.match(/שם:\s*(.+)/);
+        const dateMatch = cleanRaw.match(/מועד:\s*(\d{2})\/(\d{2})\/(\d{4})(?:\s+בשעה\s+(\d{2}:\d{2}))?/);
+        const cakeMatch = cleanRaw.match(/סוג עוגה:\s*(.+)/);
+        const deliveryMatch = cleanRaw.match(/אופן קבלה:\s*(.+)/);
+
+        if (!dateMatch) {
+            alert('לא זוהה תאריך תקין בהודעה. ודאו שהעתקתם את כל הודעת ההזמנה.');
+            return;
+        }
+
+        const customerName = nameMatch ? nameMatch[1].trim() : 'לקוח/ה';
+        const day = dateMatch[1];
+        const month = dateMatch[2];
+        const year = dateMatch[3];
+        const timeStr = dateMatch[4] || '';
+        const isoDate = year + '-' + month + '-' + day;
+        const cleanDate = year + month + day;
+
+        let datesParam = '';
+        if (timeStr) {
+            const cleanTime = timeStr.replace(':', '') + '00';
+            const startStr = cleanDate + 'T' + cleanTime;
+            const startObj = new Date(isoDate + 'T' + timeStr);
+            const endObj = new Date(startObj.getTime() + 60 * 60 * 1000);
+            
+            const endY = endObj.getFullYear();
+            const endM = String(endObj.getMonth() + 1).padStart(2, '0');
+            const endD = String(endObj.getDate()).padStart(2, '0');
+            const endH = String(endObj.getHours()).padStart(2, '0');
+            const endMin = String(endObj.getMinutes()).padStart(2, '0');
+            
+            datesParam = startStr + '/' + endY + endM + endD + 'T' + endH + endMin + '00';
+        } else {
+            const startObj = new Date(isoDate + 'T12:00:00');
+            const nextObj = new Date(startObj.getTime() + 24 * 60 * 60 * 1000);
+            const nextY = nextObj.getFullYear();
+            const nextM = String(nextObj.getMonth() + 1).padStart(2, '0');
+            const nextD = String(nextObj.getDate()).padStart(2, '0');
+            datesParam = cleanDate + '/' + nextY + nextM + nextD;
+        }
+
+        const cakeShort = cakeMatch ? ' - ' + cakeMatch[1].split(' (')[0].trim() : '';
+        const title = encodeURIComponent('הזמנה: ' + customerName + cakeShort);
+        const location = encodeURIComponent(deliveryMatch ? deliveryMatch[1].trim() : 'איסוף עצמי');
+        const details = encodeURIComponent(cleanRaw);
+
+        const calUrl = 'https://google.com' + title + '&dates=' + datesParam + '&details=' + details + '&location=' + location;
+        window.open(calUrl, '_blank');
+    }
 
     function toggleA11yMenu() {
         document.getElementById('a11yMenu').classList.toggle('hidden');
@@ -504,7 +594,6 @@
             shortbreadInput.focus();
         }
     }
-
     function formatDateHebrew(dateStr) {
         if (!dateStr) return '';
         return dateStr.split('-').reverse().join('/');
