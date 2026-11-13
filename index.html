@@ -3,32 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>הזמנת עוגה - העוגות של הודיה</title>
+    <title>העוגות של הודיה - הזמנה</title>
     <style>
         body {
             font-family: system-ui, -apple-system, sans-serif;
-            background-color: #fdf6f6;
-            color: #333;
+            background-color: #fdf8f6;
+            color: #4a3f3d;
             margin: 0;
             padding: 20px;
             display: flex;
             justify-content: center;
+            transition: background-color 0.2s, color 0.2s;
         }
         .container {
             background: white;
             padding: 24px;
             border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            box-shadow: 0 4px 15px rgba(214, 90, 98, 0.15);
             width: 100%;
             max-width: 450px;
+            position: relative;
         }
         .brand-header {
             text-align: center;
-            margin-bottom: 16px;
+            margin-bottom: 18px;
         }
-        .brand-logo {
-            width: 80px;
-            height: 80px;
+        .brand-logo-circle {
+            width: 78px;
+            height: 78px;
             background-color: #fce8ea;
             border: 2px solid #d65a62;
             border-radius: 50%;
@@ -39,23 +41,25 @@
             margin-bottom: 8px;
             overflow: hidden;
         }
-        .brand-logo img {
+        .brand-logo-circle img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
-        .brand-name {
+        h1.brand-title {
             color: #d65a62;
-            margin: 0;
-            font-size: 24px;
-            font-weight: bold;
+            font-size: 30px;
+            font-weight: 800;
+            margin: 4px 0 6px 0;
+            letter-spacing: -0.5px;
         }
         p.subtitle {
             text-align: center;
-            color: #666;
-            font-size: 14px;
-            margin-top: 6px;
-            margin-bottom: 20px;
+            color: #5c4d4a;
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 4px;
+            margin-bottom: 16px;
         }
         .form-group {
             margin-bottom: 16px;
@@ -65,20 +69,47 @@
             margin-bottom: 8px;
             font-weight: bold;
             font-size: 14px;
+            color: #5c4d4a;
         }
         input[type="text"], input[type="date"], input[type="time"], select, textarea {
             width: 100%;
             padding: 12px;
-            border: 1px solid #ddd;
+            border: 1px solid #e6d5d0;
             border-radius: 8px;
             font-size: 16px;
             box-sizing: border-box;
             font-family: inherit;
             background-color: #fff;
+            color: #333;
+        }
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #d65a62;
         }
         textarea {
             resize: vertical;
             min-height: 70px;
+        }
+        .cake-info-badge {
+            background-color: #fdf2f3;
+            border: 1px solid #f2c6ca;
+            border-radius: 10px;
+            padding: 10px 14px;
+            margin-top: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 14px;
+            color: #8a353b;
+        }
+        .cake-info-guests {
+            background-color: #d65a62;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 13px;
+            white-space: nowrap;
         }
         .row {
             display: flex;
@@ -94,7 +125,7 @@
         }
         .radio-option {
             flex: 1;
-            min-width: 85px;
+            min-width: 100px;
         }
         .radio-option input[type="radio"] {
             display: none;
@@ -103,9 +134,9 @@
             display: block;
             text-align: center;
             padding: 10px 8px;
-            border: 1px solid #ddd;
+            border: 1px solid #e6d5d0;
             border-radius: 8px;
-            background-color: #fafafa;
+            background-color: #fcf9f8;
             cursor: pointer;
             font-size: 14px;
             font-weight: normal;
@@ -117,13 +148,19 @@
             border-color: #d65a62;
             font-weight: bold;
         }
-        .hint-text {
-            font-size: 12px;
-            color: #777;
-            margin-top: 4px;
+        .disclaimer-box {
+            background-color: #fcf6f4;
+            border: 1px solid #ebd5ce;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 13px;
+            color: #6e5c58;
+            text-align: center;
+            margin-top: 16px;
+            line-height: 1.4;
         }
         .hidden {
-            display: none;
+            display: none !important;
         }
         .btn {
             display: block;
@@ -131,31 +168,143 @@
             padding: 15px;
             border: none;
             border-radius: 8px;
-            font-size: 17px;
+            font-size: 16px;
             font-weight: bold;
             color: white;
             cursor: pointer;
-            margin-top: 16px;
+            margin-top: 14px;
             text-align: center;
         }
         .btn-wa {
             background-color: #25D366;
         }
         .btn-clear {
-            background-color: #9e9e9e;
-            margin-top: 20px;
+            background-color: #b5a6a3;
+            margin-top: 12px;
             padding: 10px;
             font-size: 14px;
+        }
+        /* עיצוב תפריט נגישות */
+        .a11y-btn {
+            position: fixed;
+            top: 14px;
+            left: 14px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background-color: #2b579a;
+            color: white;
+            border: 2px solid white;
+            font-size: 22px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .a11y-menu {
+            position: fixed;
+            top: 66px;
+            left: 14px;
+            background: white;
+            border: 1px solid #ccc;
+            border-radius: 12px;
+            padding: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            width: 210px;
+        }
+        .a11y-menu h4 {
+            margin: 0 0 10px 0;
+            font-size: 15px;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 6px;
+        }
+        .a11y-menu button {
+            display: block;
+            width: 100%;
+            padding: 8px 10px;
+            margin-bottom: 6px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            background: #f9f9f9;
+            color: #333;
+            font-size: 14px;
+            text-align: right;
+            cursor: pointer;
+        }
+        .a11y-menu button:last-child {
+            margin-bottom: 0;
+        }
+        /* מצבי נגישות פעילים */
+        body.large-text .container {
+            font-size: 120%;
+        }
+        body.large-text label.field-label,
+        body.large-text input,
+        body.large-text select,
+        body.large-text textarea,
+        body.large-text .radio-option label,
+        body.large-text .disclaimer-box,
+        body.large-text .cake-info-badge {
+            font-size: 18px !important;
+        }
+        body.high-contrast {
+            background-color: #000 !important;
+            color: #fff !important;
+        }
+        body.high-contrast .container {
+            background-color: #111 !important;
+            border: 2px solid #ffff00 !important;
+            box-shadow: none !important;
+        }
+        body.high-contrast h1.brand-title,
+        body.high-contrast label.field-label,
+        body.high-contrast p.subtitle,
+        body.high-contrast .disclaimer-box,
+        body.high-contrast .cake-info-badge {
+            color: #ffff00 !important;
+            background-color: #000 !important;
+            border-color: #ffff00 !important;
+        }
+        body.high-contrast input,
+        body.high-contrast select,
+        body.high-contrast textarea {
+            background-color: #000 !important;
+            color: #fff !important;
+            border: 2px solid #ffff00 !important;
+        }
+        body.high-contrast .radio-option label {
+            background-color: #000 !important;
+            color: #fff !important;
+            border: 2px solid #ffff00 !important;
+        }
+        body.high-contrast .radio-option input[type="radio"]:checked + label,
+        body.high-contrast .cake-info-guests {
+            background-color: #ffff00 !important;
+            color: #000 !important;
         }
     </style>
 </head>
 <body>
 
+<button type="button" class="a11y-btn" onclick="toggleA11yMenu()" aria-label="תפריט נגישות" title="נגישות">♿</button>
+<div class="a11y-menu hidden" id="a11yMenu">
+    <h4>התאמות נגישות</h4>
+    <button type="button" onclick="toggleLargeText()">🔍 הגדלת טקסט</button>
+    <button type="button" onclick="toggleHighContrast()">🌗 ניגודיות גבוהה</button>
+    <button type="button" onclick="resetA11y()">🔄 איפוס נגישות</button>
+</div>
+
 <div class="container">
     <div class="brand-header">
-        <div class="brand-logo" id="logoContainer">🧁</div>
-        <h1 class="brand-name">העוגות של הודיה</h1>
-        <p class="subtitle">מלאו את פרטי ההזמנה ולחצו לשליחה בוואטסאפ</p>
+        <div class="brand-logo-circle">
+            <img src="logo.png" alt="🧁" onerror="this.style.display='none'; this.parentElement.textContent='🧁';">
+        </div>
+        <h1 class="brand-title">העוגות של הודיה</h1>
+        <p class="subtitle">איזו עוגה הייתם רוצים להזמין</p>
     </div>
     
     <div class="form-group">
@@ -191,19 +340,24 @@
         <label class="field-label" for="cakeType">סוג העוגה:</label>
         <select id="cakeType" onchange="toggleCakeDetails()">
             <option value="" selected>-- בחרו סוג עוגה --</option>
-            <option value="בנטו">בנטו</option>
-            <option value="בנטו לב">בנטו לב</option>
-            <option value="מיני">מיני</option>
-            <option value="מיני לב">מיני לב</option>
-            <option value="מעוצבת">מעוצבת</option>
-            <option value="מעוצבת לב">מעוצבת לב</option>
+            <option value="בנטו (קוטר 10 ס&quot;מ, גובה 6 ס&quot;מ - מתאים לזוג)">בנטו • קוטר 10 ס"מ, גובה 6 ס"מ (👥 2)</option>
+            <option value="בנטו לב (קוטר 10 ס&quot;מ, גובה 6 ס&quot;מ - מתאים לזוג)">בנטו לב • קוטר 10 ס"מ, גובה 6 ס"מ (👥 2)</option>
+            <option value="מיני (קוטר 12 ס&quot;מ, גובה 10 ס&quot;מ - עד 10 אנשים)">מיני • קוטר 12 ס"מ, גובה 10 ס"מ (👥 עד 10)</option>
+            <option value="מיני לב (קוטר 12 ס&quot;מ, גובה 10 ס&quot;מ - עד 10 אנשים)">מיני לב • קוטר 12 ס"מ, גובה 10 ס"מ (👥 עד 10)</option>
+            <option value="עוגה מעוצבת (קוטר 20 ס&quot;מ - עד 20 אנשים)">עוגה מעוצבת • קוטר 20 ס"מ (👥 עד 20)</option>
+            <option value="עוגה מעוצבת לב (קוטר 20 ס&quot;מ - עד 20 אנשים)">עוגה מעוצבת לב • קוטר 20 ס"מ (👥 עד 20)</option>
             <option value="גן A4">גן A4</option>
             <option value="גן A3">גן A3</option>
-            <option value="מארז בנטו">מארז בנטו</option>
+            <option value="מארז בנטו (קוטר 10 ס&quot;מ, גובה 6 ס&quot;מ - מתאים לזוג)">מארז בנטו • קוטר 10 ס"מ, גובה 6 ס"מ (👥 2)</option>
             <option value="בצק פריך">בצק פריך</option>
             <option value="מוס">מוס</option>
             <option value="אחר">אחר (מלל חופשי)</option>
         </select>
+
+        <div class="cake-info-badge hidden" id="cakeInfoBadge">
+            <span id="cakeDimensionsText"></span>
+            <span class="cake-info-guests" id="cakeGuestsText"></span>
+        </div>
     </div>
 
     <div class="form-group hidden" id="shortbreadGroup">
@@ -227,10 +381,6 @@
                 <input type="radio" id="kosherParve" name="kosher" value="פרווה">
                 <label for="kosherParve">פרווה</label>
             </div>
-            <div class="radio-option">
-                <input type="radio" id="kosherLater" name="kosher" value="יקבע בהמשך">
-                <label for="kosherLater">יקבע בהמשך</label>
-            </div>
         </div>
     </div>
 
@@ -244,10 +394,6 @@
             <div class="radio-option">
                 <input type="radio" id="flavorChoc" name="flavor" value="שוקולד">
                 <label for="flavorChoc">שוקולד</label>
-            </div>
-            <div class="radio-option">
-                <input type="radio" id="flavorLater" name="flavor" value="יקבע בהמשך">
-                <label for="flavorLater">יקבע בהמשך</label>
             </div>
         </div>
     </div>
@@ -272,13 +418,32 @@
         <textarea id="orderNotes"></textarea>
     </div>
 
-    <button type="button" class="btn btn-wa" onclick="sendOrderToWhatsApp()">שליחת הזמנה בוואטסאפ 📲</button>
-    <div class="hint-text" style="text-align: center;">יש לכם תמונות השראה? תוכלו לצרף אותן ישירות בצ׳אט מיד לאחר פתיחת הוואטסאפ 📷</div>
-    
+    <div class="disclaimer-box">
+        שימו לב: שליחת הפרטים אינה מהווה אישור סופי או התחייבות להזמנה. אישור ההזמנה ותיאום התשלום יתבצעו מולכם בהודעה חוזרת בוואטסאפ.
+    </div>
+
+    <button type="button" class="btn btn-wa" onclick="sendOrderToWhatsApp()">שליחת העוגה שהייתי רוצה בוואטסאפ 📲</button>
     <button type="button" class="btn btn-clear" onclick="clearForm()">נקה טופס</button>
 </div>
 <script>
     const MY_PHONE = '972546686383';
+
+    function toggleA11yMenu() {
+        document.getElementById('a11yMenu').classList.toggle('hidden');
+    }
+
+    function toggleLargeText() {
+        document.body.classList.toggle('large-text');
+    }
+
+    function toggleHighContrast() {
+        document.body.classList.toggle('high-contrast');
+    }
+
+    function resetA11y() {
+        document.body.classList.remove('large-text', 'high-contrast');
+        document.getElementById('a11yMenu').classList.add('hidden');
+    }
 
     function toggleAddress() {
         const type = document.getElementById('deliveryType').value;
@@ -296,9 +461,28 @@
         const customCakeInput = document.getElementById('customCakeText');
         const shortbreadGroup = document.getElementById('shortbreadGroup');
         const shortbreadInput = document.getElementById('shortbreadDetails');
+        
+        const infoBadge = document.getElementById('cakeInfoBadge');
+        const dimText = document.getElementById('cakeDimensionsText');
+        const guestsText = document.getElementById('cakeGuestsText');
 
         customCakeGroup.classList.add('hidden');
         shortbreadGroup.classList.add('hidden');
+        infoBadge.classList.add('hidden');
+
+        if (cakeType.includes('בנטו')) {
+            dimText.textContent = '📏 קוטר 10 ס"מ | גובה 6 ס"מ';
+            guestsText.textContent = '👥 מתאים לזוג';
+            infoBadge.classList.remove('hidden');
+        } else if (cakeType.includes('מיני')) {
+            dimText.textContent = '📏 קוטר 12 ס"מ | גובה 10 ס"מ';
+            guestsText.textContent = '👥 עד 10 אנשים';
+            infoBadge.classList.remove('hidden');
+        } else if (cakeType.includes('עוגה מעוצבת')) {
+            dimText.textContent = '📏 קוטר 20 ס"מ';
+            guestsText.textContent = '👥 עד 20 אנשים';
+            infoBadge.classList.remove('hidden');
+        }
 
         if (cakeType === 'אחר') {
             customCakeGroup.classList.remove('hidden');
@@ -361,7 +545,7 @@
 
         const timeText = data.time ? ' בשעה ' + data.time : '';
 
-        let text = '*🧁 הזמנה חדשה לקונדיטוריה 🧁*\n\n';
+        let text = '*🧁 הזמנה חדשה - העוגות של הודיה 🧁*\n\n';
         text += '*שם:* ' + data.name + '\n';
         text += '*מועד:* ' + formatDateHebrew(data.date) + timeText + '\n';
         text += '*אופן קבלה:* ' + deliveryText + '\n';
@@ -392,7 +576,7 @@
         }
 
         const encodedText = encodeURIComponent(text.trim());
-        window.location.href = 'whatsapp://send?phone=' + MY_PHONE + '&text=' + encodedText;
+        window.location.href = 'https://wa.me' + MY_PHONE + '?text=' + encodedText;
     }
 
     function clearForm() {
