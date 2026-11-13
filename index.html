@@ -19,7 +19,7 @@
             background: white;
             padding: 24px;
             border-radius: 16px;
-            box-shadow: 0 4px 15px rgba(214, 90, 98, 0.15);
+            box-shadow: 0 4px 15px rgba(217, 174, 162, 0.2);
             width: 100%;
             max-width: 450px;
             position: relative;
@@ -28,26 +28,15 @@
             text-align: center;
             margin-bottom: 18px;
         }
-        .brand-logo-circle {
-            width: 78px;
-            height: 78px;
-            background-color: #fce8ea;
-            border: 2px solid #d65a62;
-            border-radius: 50%;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 38px;
-            margin-bottom: 8px;
-            overflow: hidden;
-        }
-        .brand-logo-circle img {
+        .brand-logo-clean {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
+            max-width: 240px;
+            height: auto;
+            display: block;
+            margin: 0 auto 8px auto;
         }
         h1.brand-title {
-            color: #d65a62;
+            color: #c98f7f;
             font-size: 30px;
             font-weight: 800;
             margin: 4px 0 6px 0;
@@ -84,32 +73,42 @@
         }
         input:focus, select:focus, textarea:focus {
             outline: none;
-            border-color: #d65a62;
+            border-color: #d9aea2;
         }
         textarea {
             resize: vertical;
             min-height: 70px;
         }
         .cake-info-badge {
-            background-color: #fdf2f3;
-            border: 1px solid #f2c6ca;
+            background-color: #fdf6f4;
+            border: 1px solid #e6cbc3;
             border-radius: 10px;
             padding: 10px 14px;
             margin-top: 8px;
             display: flex;
             align-items: center;
             justify-content: space-between;
+            gap: 8px;
             font-size: 14px;
-            color: #8a353b;
+            color: #7d584e;
         }
         .cake-info-guests {
-            background-color: #d65a62;
-            color: white;
-            padding: 4px 10px;
+            background-color: #ffffff;
+            color: #5c4d4a;
+            border: 1px solid #e6cbc3;
+            padding: 5px 12px;
             border-radius: 20px;
             font-weight: bold;
             font-size: 13px;
             white-space: nowrap;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .people-icon {
+            width: 22px;
+            height: 22px;
+            flex-shrink: 0;
         }
         .row {
             display: flex;
@@ -143,9 +142,9 @@
             transition: all 0.2s;
         }
         .radio-option input[type="radio"]:checked + label {
-            background-color: #d65a62;
+            background-color: #d9aea2;
             color: white;
-            border-color: #d65a62;
+            border-color: #d9aea2;
             font-weight: bold;
         }
         .disclaimer-box {
@@ -300,9 +299,7 @@
 
 <div class="container">
     <div class="brand-header">
-        <div class="brand-logo-circle">
-            <img src="logo.png" alt="🧁" onerror="this.style.display='none'; this.parentElement.textContent='🧁';">
-        </div>
+        <img src="logo.png" alt="העוגות של הודיה" class="brand-logo-clean">
         <h1 class="brand-title">העוגות של הודיה</h1>
         <p class="subtitle">איזו עוגה הייתם רוצים להזמין</p>
     </div>
@@ -340,15 +337,15 @@
         <label class="field-label" for="cakeType">סוג העוגה:</label>
         <select id="cakeType" onchange="toggleCakeDetails()">
             <option value="" selected>-- בחרו סוג עוגה --</option>
-            <option value="בנטו (קוטר 10 ס&quot;מ, גובה 6 ס&quot;מ - מתאים לזוג)">בנטו • קוטר 10 ס"מ, גובה 6 ס"מ (👥 2)</option>
-            <option value="בנטו לב (קוטר 10 ס&quot;מ, גובה 6 ס&quot;מ - מתאים לזוג)">בנטו לב • קוטר 10 ס"מ, גובה 6 ס"מ (👥 2)</option>
-            <option value="מיני (קוטר 12 ס&quot;מ, גובה 10 ס&quot;מ - עד 10 אנשים)">מיני • קוטר 12 ס"מ, גובה 10 ס"מ (👥 עד 10)</option>
-            <option value="מיני לב (קוטר 12 ס&quot;מ, גובה 10 ס&quot;מ - עד 10 אנשים)">מיני לב • קוטר 12 ס"מ, גובה 10 ס"מ (👥 עד 10)</option>
-            <option value="עוגה מעוצבת (קוטר 20 ס&quot;מ - עד 20 אנשים)">עוגה מעוצבת • קוטר 20 ס"מ (👥 עד 20)</option>
-            <option value="עוגה מעוצבת לב (קוטר 20 ס&quot;מ - עד 20 אנשים)">עוגה מעוצבת לב • קוטר 20 ס"מ (👥 עד 20)</option>
-            <option value="גן A4">גן A4</option>
-            <option value="גן A3">גן A3</option>
-            <option value="מארז בנטו (קוטר 10 ס&quot;מ, גובה 6 ס&quot;מ - מתאים לזוג)">מארז בנטו • קוטר 10 ס"מ, גובה 6 ס"מ (👥 2)</option>
+            <option value="בנטו (קוטר 10 ס&quot;מ, גובה 6 ס&quot;מ - מתאים לזוג)">בנטו • קוטר 10 ס"מ, גובה 6 ס"מ (🧑‍🤝‍🧑 2)</option>
+            <option value="בנטו לב (קוטר 10 ס&quot;מ, גובה 6 ס&quot;מ - מתאים לזוג)">בנטו לב • קוטר 10 ס"מ, גובה 6 ס"מ (🧑‍🤝‍🧑 2)</option>
+            <option value="מארז בנטו (עוגת בנטו קוטר 10 ס&quot;מ, גובה 6 ס&quot;מ + 6 קאפקייקס מעוצבים)">מארז בנטו • עוגת בנטו + 6 קאפקייקס מעוצבים</option>
+            <option value="מיני (קוטר 12 ס&quot;מ, גובה 10 ס&quot;מ - 8-10 אנשים)">מיני • קוטר 12 ס"מ, גובה 10 ס"מ (🧑‍🤝‍🧑 8-10)</option>
+            <option value="מיני לב (קוטר 12 ס&quot;מ, גובה 10 ס&quot;מ - 8-10 אנשים)">מיני לב • קוטר 12 ס"מ, גובה 10 ס"מ (🧑‍🤝‍🧑 8-10)</option>
+            <option value="עוגה מעוצבת (קוטר 20 ס&quot;מ - 18-20 אנשים)">עוגה מעוצבת • קוטר 20 ס"מ (🧑‍🤝‍🧑 18-20)</option>
+            <option value="עוגה מעוצבת לב (קוטר 20 ס&quot;מ - 18-20 אנשים)">עוגה מעוצבת לב • קוטר 20 ס"מ (🧑‍🤝‍🧑 18-20)</option>
+            <option value="עוגת גן A4 (כולל דף סוכר ועיצוב אישי)">עוגת גן A4 • כולל דף סוכר ועיצוב אישי</option>
+            <option value="עוגת גן A3 (כולל דף סוכר ועיצוב אישי)">עוגת גן A3 • כולל דף סוכר ועיצוב אישי</option>
             <option value="בצק פריך">בצק פריך</option>
             <option value="מוס">מוס</option>
             <option value="אחר">אחר (מלל חופשי)</option>
@@ -428,6 +425,13 @@
 <script>
     const MY_PHONE = '972546686383';
 
+    const COLOR_PEOPLE_SVG = '<svg class="people-icon" viewBox="0 0 24 24">' +
+        '<circle cx="16.5" cy="7.5" r="2.5" fill="#64b5f6"/>' +
+        '<path d="M16.5 11.5c-2.2 0-4.5 1.1-4.5 3.2V17h9v-2.3c0-2.1-2.3-3.2-4.5-3.2z" fill="#64b5f6"/>' +
+        '<circle cx="8.5" cy="7.5" r="3" fill="#d65a62"/>' +
+        '<path d="M8.5 12c-2.8 0-5.5 1.4-5.5 4v2.5h11V16c0-2.6-2.7-4-5.5-4z" fill="#d65a62"/>' +
+    '</svg>';
+
     function toggleA11yMenu() {
         document.getElementById('a11yMenu').classList.toggle('hidden');
     }
@@ -470,17 +474,25 @@
         shortbreadGroup.classList.add('hidden');
         infoBadge.classList.add('hidden');
 
-        if (cakeType.includes('בנטו')) {
-            dimText.textContent = '📏 קוטר 10 ס"מ | גובה 6 ס"מ';
-            guestsText.textContent = '👥 מתאים לזוג';
+        if (cakeType.startsWith('מארז בנטו')) {
+            dimText.textContent = 'קוטר 10 ס"מ, גובה 6 ס"מ';
+            guestsText.textContent = 'עוגת בנטו + 6 קאפקייקס מעוצבים';
+            infoBadge.classList.remove('hidden');
+        } else if (cakeType.includes('בנטו')) {
+            dimText.textContent = 'קוטר 10 ס"מ | גובה 6 ס"מ';
+            guestsText.innerHTML = COLOR_PEOPLE_SVG + '<span>2</span>';
             infoBadge.classList.remove('hidden');
         } else if (cakeType.includes('מיני')) {
-            dimText.textContent = '📏 קוטר 12 ס"מ | גובה 10 ס"מ';
-            guestsText.textContent = '👥 עד 10 אנשים';
+            dimText.textContent = 'קוטר 12 ס"מ | גובה 10 ס"מ';
+            guestsText.innerHTML = COLOR_PEOPLE_SVG + '<span>8-10</span>';
             infoBadge.classList.remove('hidden');
         } else if (cakeType.includes('עוגה מעוצבת')) {
-            dimText.textContent = '📏 קוטר 20 ס"מ';
-            guestsText.textContent = '👥 עד 20 אנשים';
+            dimText.textContent = 'קוטר 20 ס"מ';
+            guestsText.innerHTML = COLOR_PEOPLE_SVG + '<span>18-20</span>';
+            infoBadge.classList.remove('hidden');
+        } else if (cakeType.startsWith('עוגת גן ')) {
+            dimText.textContent = cakeType.startsWith('עוגת גן A4') ? 'גודל A4' : 'גודל A3';
+            guestsText.textContent = 'כולל דף סוכר ועיצוב אישי';
             infoBadge.classList.remove('hidden');
         }
 
